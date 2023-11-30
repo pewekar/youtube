@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Transcript Summarizer</title>
+</head>
+<body>
+    <h1>YouTube Transcript Summarizer</h1>
+    <form id="summarizerForm">
+        <input type="text" id="youtubeLink" placeholder="Enter YouTube Link" size="60">
+        <button type="submit">Summarize</button>
+    </form>
+    <div id="summaryResult"></div>
+    <a id="downloadLink" style="display:none;">Download Summary</a>
+
+    <script>
+        document.getElementById('summarizerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var youtubeLink = document.getElementById('youtubeLink').value;
+            fetch('/summarize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ youtube_link: youtubeLink }),
+            })
+            .then(response => response.json())
+            .then(data => {
+	        var summaryElement = document.getElementById('summaryResult');
+	        var downloadLinkElement = document.getElementById('downloadLink');
+	    
+	        summaryElement.innerText = data.summary || 'No summary available';
+	        if (data.summary) {
+	            var blob = new Blob([data.summary], {type: 'text/plain'});
+	            downloadLinkElement.href = URL.createObjectURL(blob);
+	            downloadLinkElement.download = "summary.txt";
+	            downloadLinkElement.style.display = 'block';
+	        }
+            });
+        });
+    </script>
+</body>
+</html>
